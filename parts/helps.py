@@ -32,10 +32,16 @@ async def help_me(ctx):
         try:
             if args[1] == "add":
                 await send_help(["auto_role add", "add new automaticaly income role\n\nAdministrator use only\n\navailable arguments:\n:black_small_square: name (@ROLE or ROLE) - specifies role if role dosn't exist create one\n:black_small_square: payday (money) - how much someone who have roll get\n:black_small_square: payday_time (days hours minutes seconds) - time between incomes\n\nexample: `auto_role add @role 2000 1d 2h 3m 4s` (This create new auto income role named role that get 2000 coins every 1 day, 2 hours, 3 minutes and 4 secunds)"], ctx.channel)
+            elif args[1] in ["rem", "remove", "del", "delete"]:
+                await send_help(["auto_role remove", "remove existing automaticaly income role\n\nAdministrator use only\n\navailable arguments:\n:black_small_square: name (@ROLE or ROLE) - specifies role name\n\nexample: `auto_role remove role` (This remove auto_role named role)\n\naliases: rem, remove, del, delete"], ctx.channel)
+            elif args[1] == "edit":
+                await send_help(["auto_role edit", "edit old automaticaly income role\n\nAdministrator use only\n\navailable arguments:\n:black_small_square: name (@ROLE or ROLE) - specifies role name\n:black_small_square: value_name (payday/pd or payday_time/pdt)- specifies what woud be changed\n:black_small_square: new_value (value) - it is specific for every value\n\nexamples: `auto_role edit role payday 5000` (set payday of role to 5000)\n`auto_role edit role payday_time 1d 2h 3m 4s` (set payday_time of role to 1 day, 2 hours, 3 minutes and 4 secunds"], ctx.channel)
+            elif args[1] == "get":
+                await send_help(["auto_role get", "get every auto_role\n\neveryone can use\n\nNo arguments\n\nexample: `auto_role get`"], ctx.channel)
             else:
                 await default_help(ctx)
         except:
-            await send_help([["Commands list", "```help auto_role add```"], ["Aliases", "ar, autorole"]], ctx.channel)
+            await send_help([["Commands list", "```help auto_role add\nhelp auto_role remove\nhelp auto_role edit```"], ["Aliases", "ar, autorole"]], ctx.channel)
     elif args[0] in ["server", "sr", "serv"]:
         try:
             if args[1] == "clear":
@@ -49,26 +55,34 @@ async def help_me(ctx):
     elif args[0] in ["aconut", "balance", "bal", "user", "mem", "member"]:
         await send_help(["aconut", "Show someone aconut\n\nEveryone can use\n\navailable arguments:\n:white_small_square: user (@user or user name) - if you dont specify set to you"], ctx.channel)
     elif args[0] in ["list", "all"]:
-        await send_help(["Commands' list",
+        await send_help([["Commands' list",
                         """
-                        RP
-                        - `rp start` start
-                        - `rp stop` stop
-                        - `rp pause` pause
-                        - `rp resume` resume
+                        RP - `rp`, `rpg`, `role_play`, `roleplay`
+                        - start: `start`
+                        - stop: `stop`
+                        - pause: `pause`
+                        - resume: `resume`
                         
-                        auto_role
-                        - `auto_role add` add
+                        auto_role - `auto_role`, `ar`, `autorole`
+                        - add: `auto_role add`
+                        - remove: `auto_role remove`/`auto_role rem`/`auto_role del`/``
+                        - edit: `auto_role edit`
+                        - get: `auto_role get`
                         
                         server
-                        - `server clear` clear
-                        - `server delete` delete
-                        
-                        others
-                        - `nuke_channel` nuke_channel
-                        - `ping` ping
-                        - `aconut` aconut
-                        - `help` help"""], ctx.channel)
+                        - clear: `server clear`
+                        - delete: `server delete`
+
+                        nuke_channel: `nuke_channel`
+                        ping: `ping`
+                        aconut: `aconut`
+                        help `help`
+                        """], ["Syntax here", 
+                        """
+                        command - `how to write it`
+                         - sub command: `this must be afer command tu func sub command`
+                        !!! If a sub command exists it must be used. Without it the command does not work. !!!
+                        """, False]], ctx.channel)
 
 
 

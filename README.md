@@ -2,12 +2,12 @@
 Version 0.1
 (unfinished)
 ### Features
- - delete messages              (new in version 0.1) (last edited in version 0.1)
- - add auto_roles               (new in version 0.1) (last edited in version 0.1)
- - start/stop/pause/resume RP   (new in version 0.1) (last edited in version 0.1)
- - nuking                       (new in version 0.1) (last edited in version 0.1)
- - pinging                      (new in version 0.1) (last edited in version 0.1)
- - news                         (new in version 0.1) (last edited in version 0.1)
+ - Delete messages              (new in version 0.1) (last edited in version 0.1)
+ - Auto_roles                   (new in version 0.1) (last edited in version 0.2)
+ - RP                           (new in version 0.1) (last edited in version 0.1)
+ - Nuking                       (new in version 0.1) (last edited in version 0.1)
+ - Pinging                      (new in version 0.1) (last edited in version 0.1)
+ - News                         (new in version 0.1) (last edited in version 0.2)
 
 ### Complite bar
-[XX------------------]10%
+[XXX-----------------]13%

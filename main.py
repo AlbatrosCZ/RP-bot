@@ -4,6 +4,7 @@ from classes.holder import holder
 from parts.if_is import *
 from parts.messaging import *
 from parts.helps import help_me
+from parts.to_time import *
 TOKEN = open("token.txt").read()
 
 bot = commands.Bot(command_prefix='-')
@@ -121,15 +122,21 @@ async def auto_role(ctx, *args):
         return 
     if args[0] == "add":
         await add_auto_role(ctx, args[1:])
+    elif args[0] == "get":
+        await get_auto_role(ctx, args)
+    elif args[0] in ["rem", "remove", "del", "delete"]:
+        await remove_auto_role(ctx, args[1:])
+    elif args[0] in ["edit"]:
+        await edit_auto_role(ctx, args[1:])
     else:
         await send_error(ctx, "Bad argumenting")
         return
 async def add_auto_role(ctx, args):
     if not admin:
-        dont_have_permmission(ctx, "Administration")
+        await dont_have_permmission(ctx, "Administration")
         return
     if len(args) < 1:
-        send_error(ctx, "This function need more arguments. For more info write help auto_role add")
+        await send_error(ctx, "This function need more arguments. For more info write help auto_role add")
         return
     if "<@&" not in args[0]:
         role = discord.utils.get(ctx.guild.roles, name = args[0])
@@ -155,7 +162,10 @@ async def add_auto_role(ctx, args):
                 return
     else:
         full_time = 60
-
+    for role in DATA.get_server(ctx.guild.id).auto_role_list:
+        if role.name == args[0]:
+            await send_error(ctx, "This auto_role is exists. You can't duplicate it only edit. For more info write help auto_role")
+            return
     if role != None:
         DATA.get_server(ctx.guild.id).add_auto_role(role, 2000, 60)
         await ctx.channel.delete_messages([ctx.message])
@@ -164,6 +174,78 @@ async def add_auto_role(ctx, args):
         DATA.get_server(ctx.guild.id).add_auto_role(role, 2000, 60)
         await ctx.channel.delete_messages([ctx.message])
     await ctx.send(f"New Auto Role {role.name}\npayday: {money}\npay every: {full_time}s")
+async def get_auto_role(ctx, args):
+    ret = "```Auto Income Roles:\n"
+    roles = DATA.get_server(ctx.guild.id).auto_role_list
+    for role in roles:
+        ret += "\n"
+        ret += f"  {role.name} - {role.payday}/{time_to_text(role.payday_time)}"
+    await ctx.channel.send(ret + "```")
+async def remove_auto_role(ctx, args):
+    if not admin(ctx):
+        await dont_have_permmission(ctx, "administrator")
+        return
+    if len(args) < 1:
+        send_error(ctx, "This function need more arguments. For more info write help auto_role")
+        return
+    roles = DATA.get_server(ctx.server.id).auto_role_list
+    for i in range(len(roles)):
+        if roles[i].name == args[0]:
+            del roles[i]
+            await ctx.message.add_reaction("✅")
+            await send(ctx.channel, "Succesfully deleted")
+            return
+    await send_error(ctx, f"Role named {args[0]} dosn't exists")
+async def edit_auto_role(ctx, args):
+    if not admin(ctx):
+        await dont_have_permmission(ctx, "administrator")
+        return
+    if len(args) < 3:
+        await send_error(ctx, "This function need more arguments. For more info write help auto_role add")
+        return
+    if "<@&" not in args[0]:
+        role = discord.utils.get(ctx.guild.roles, name = args[0])
+    else:
+        role = discord.utils.get(ctx.guild.roles, id = int(args[0][3:-1]))
+    value_name = args[1]
+    if role == None:
+        await send_error(ctx, "Bad role")
+        return
+    elif value_name == "name":
+        await send_error(ctx, "Value name change automaticaly on role name changed and if you want change auto_role delete this and next create new")
+        return
+    roles = DATA.get_server(ctx.guild.id).auto_role_list
+    for rol in roles:
+        if role.name != rol.name:
+            pass
+        elif value_name in ["payday", "pd"]:
+            try:
+                rol.payday = int(args[2])
+            except:
+                await send_error(ctx, "You must input integer when chanege how much money role get (payday)")
+                return
+        elif value_name in ["payday_time", "pdt"]:
+            tim = 0
+            try:
+                for i in args[2:]:
+                    if i[-1:] == "d":
+                        tim += int(i[:-1])*60*60*24
+                    elif i[-1:] == "h":
+                        tim += int(i[:-1])*60*60
+                    elif i[-1:] == "m":
+                        tim += int(i[:-1])*60
+                    elif i[-1:] == "s":
+                        tim += int(i[:-1])
+                    else:
+                        await send_error(ctx, "Bad time input")
+            except:
+                await send_error(ctx, "Bad input on payday_time")
+                return
+
+            rol.payday_time = tim
+        else:
+            await send_error(ctx, "Bad inputed value name")
+            return 
 
 
 @bot.command(aliases = ["sr", "serv"])
@@ -256,28 +338,19 @@ async def aconut(ctx):
 @bot.command()
 async def news(ctx):
     await ctx.channel.send("""BOTS NEWS
-    ```Version: 0.1
+    ```Version: 0.2 (unfinished)
         
     New in this version:
-        1 Commands
-        1.1 help
-        1.2 rpg
-        1.3 auto_role
-        1.4 server
-        1.5 nuke_channel
-        1.6 ping
-        1.7 aconut
-        1.8 news
-        2 Saves
-        3 News in program
-        3.1 classes
-        3.2 parts
+        1 New in program
+        1.1 Automaticaly rename auto_role
 
     Bug fix:
         Nothing bug fix (nothing find)
 
     Edit olds:
-        Nothing```""")
+        1 Commands
+        1.1 auto_role (add get, remove and edit)
+        1.2 help (update) ```""")
 
 @bot.event
 async def on_member_remove(member):
@@ -291,8 +364,11 @@ async def on_member_join(member):
         member.guild.system_channel.send("<@!284204934818430996> (bot's author) just connect to your server. You can task him for bot")
     DATA.get_server(member.guild.id).add_user(member)
 @bot.event
-async def on_member_update(before, after):
-    print(before, after)
+async def on_guild_role_update(before, after):
+    roles = DATA.get_server(before.guild.id).auto_role_list
+    for i in range(len(roles)):
+        if roles[i].name == before.name:
+            roles[i].name = after.name
 @bot.event
 async def on_message(ctx):
     if ctx.content[0:5] == bot.command_prefix + "help" or ctx.content[0:4] == "help":
